@@ -22,7 +22,13 @@ ctx = canvas.getContext("2d");
 canvasW=canvas.width  = 1080;//window.innerWidth;
 canvasH=canvas.height = 1920;//window.innerHeight;
 var tileSize=100;
-var grid=[["A","E","I","O","U","Y","f","o","u","r"],["A","E","I","O","U","Y","f","o","u","r"],["A","E","I","O","U","Y","f","o","u","r"],["A","E","I","O","U","Y","f","o","u","r"],["A","E","I","O","U","Y","f","o","u","r"],["A","E","I","O","U","Y","f","o","u","r"],["A","E","I","O","U","Y","f","o","u","r"],["A","E","I","O","U","Y","f","o","u","r"],["A","E","I","O","U","Y","f","o","u","r"],["A","E","I","O","U","Y","f","o","u","r"]];
+var grid=[[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}]];
+for(var i=0;i<10;i++)
+    for(var j=0;j<10;j++)
+    {
+        grid[i][j].animationX=0;
+        grid[i][j].animationY=0;
+    }
 
 //controls
 canvas.addEventListener("mousemove",mossoMouse);
@@ -91,10 +97,72 @@ function run()
     }
     else if(level==0)
     {
+        var gridOffsetX=100;
+        var gridOffsetY=500;
+        var selectedList=[];
+
+        ctx.fillStyle="#FFF";
+        ctx.font = "80px Arial";
+        ctx.textAlign = "center";
         for(var i=0;i<10;i++)
             for(var j=0;j<10;j++)
-                //TODO stampa elementi della griglia
+            {
+                ctx.fillStyle="#FFF";
+                ctx.fillText(grid[i][j].val,gridOffsetX+i*tileSize+grid[i][j].animationX,gridOffsetY+j*tileSize+grid[i][j].animationY);
+                
+                //gestisci l'animazione
+                if(Math.abs(grid[i][j].animationX)>1 )
+                    grid[i][j].animationX*=0.8;
+                else
+                    grid[i][j].animationX=0;
+                if(Math.abs(grid[i][j].animationY)>1 )
+                    grid[i][j].animationY*=0.8;
+                else
+                    grid[i][j].animationY=0;
+
+                //controlla se il mouse l'ha selezionato
+                if(distanceFrom(mousex,mousey,i*tileSize+gridOffsetX,j*tileSize+gridOffsetY)<100)
+                {
+                    var tmp=new Object();
+                    tmp.r=i;
+                    tmp.c=j;
+                    selectedList.push(tmp);
+                    ctx.fillStyle="#F00";
+                }
+                else
+                    ctx.fillStyle="#0F0";
+                ctx.fillRect(i*tileSize+gridOffsetX,j*tileSize+gridOffsetY,10,10);
+            }
+        //sta cliccando, ed è in mezzo a 4 oggetti
+        if(dragging && selectedList.length>=3)
+        {
+            rotateTiles(selectedList);
+            dragging=false;
+        }
     }
+}
+function rotateTiles(selectedList)
+{
+    var Or=99;
+    var Oc=99;
+    for(var i=0;i<selectedList.length;i++)
+    {
+        if(selectedList[i].r<Or)
+            Or=selectedList[i].r;
+        if(selectedList[i].c<Oc)
+            Oc=selectedList[i].c;
+    }
+    var tmp=grid[Or][Oc];
+    grid[Or][Oc]=grid[Or][Oc+1];    
+    grid[Or][Oc+1]=grid[Or+1][Oc+1];
+    grid[Or+1][Oc+1]=grid[Or+1][Oc];
+    grid[Or+1][Oc]=tmp;
+
+    grid[Or][Oc].animationY=100;
+    grid[Or][Oc+1].animationX=100;
+    grid[Or+1][Oc+1].animationY=-100;
+    grid[Or+1][Oc].animationX=-100;
+    //TODO check se hai formato un 4
 }
 /*#############
     Funzioni Utili
@@ -109,7 +177,10 @@ function distanceFrom(a,b)
 {
     return Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y));
 }
-
+function distanceFrom(ax,ay,bx,by)
+{
+    return Math.sqrt((ax-bx)*(ax-bx)+(ay-by)*(ay-by));
+}
 //controlli mobile
 function mossoTap(evt)
 {
