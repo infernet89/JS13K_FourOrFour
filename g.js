@@ -97,6 +97,7 @@ function run()
     }
     else if(level==0)
     {
+        var animatingObjects=0;
         var gridOffsetX=100;
         var gridOffsetY=500;
         var selectedList=[];
@@ -110,15 +111,25 @@ function run()
                 ctx.fillStyle="#FFF";
                 ctx.fillText(grid[i][j].val,gridOffsetX+i*tileSize+grid[i][j].animationX,gridOffsetY+j*tileSize+grid[i][j].animationY);
                 
-                //gestisci l'animazione
-                if(Math.abs(grid[i][j].animationX)>1 )
-                    grid[i][j].animationX*=0.8;
+                //gestisci le animazioni
+                if(Math.abs(grid[i][j].animationX)>1)
+                {
+                    grid[i][j].animationX*=0.8
+                    animatingObjects++;
+                }                    
                 else
+                {
                     grid[i][j].animationX=0;
-                if(Math.abs(grid[i][j].animationY)>1 )
+                }
+                if(Math.abs(grid[i][j].animationY)>1)
+                {
                     grid[i][j].animationY*=0.8;
+                    animatingObjects++;
+                }
                 else
+                {
                     grid[i][j].animationY=0;
+                }                    
 
                 //controlla se il mouse l'ha selezionato
                 if(distanceFrom(mousex,mousey,i*tileSize+gridOffsetX,j*tileSize+gridOffsetY)<100)
@@ -139,7 +150,37 @@ function run()
             rotateTiles(selectedList);
             dragging=false;
         }
+        //le animazioni sono finite
+        else if(animatingObjects==0)
+            checkForFour();
     }
+}
+function checkForFour()
+{
+    for(var i=0;i<10 -1;i++)
+        for(var j=0;j<10 -1;j++)
+        {
+            if(grid[i][j].val==grid[i+1][j].val && grid[i][j].val==grid[i][j+1].val && grid[i][j].val==grid[i+1][j+1].val)
+            {
+                //sposta in giù di 2 (gravità)
+                for(var k=j+1;k>1;k--)
+                {
+                    grid[i][k].val=grid[i][k-2].val;
+                    grid[i][k].animationY=-200;
+                    grid[i+1][k].val=grid[i+1][k-2].val;
+                    grid[i+1][k].animationY=-200;
+                }
+                //TODO fai apparire 4 blocchi sopra
+                grid[i][0].val="_";
+                grid[i][0].animationY=-800;
+                grid[i+1][0].val="!";
+                grid[i+1][0].animationY=-800;
+                grid[i][1].val="?";
+                grid[i][1].animationY=-800;
+                grid[i+1][1].val="=";
+                grid[i+1][1].animationY=-800;
+            }
+        }
 }
 function rotateTiles(selectedList)
 {
@@ -162,7 +203,6 @@ function rotateTiles(selectedList)
     grid[Or][Oc+1].animationX=100;
     grid[Or+1][Oc+1].animationY=-100;
     grid[Or+1][Oc].animationX=-100;
-    //TODO check se hai formato un 4
 }
 /*#############
     Funzioni Utili
