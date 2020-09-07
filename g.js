@@ -216,8 +216,8 @@ function explosionParticles(x,y,color)
     for(ip=0;ip<50;ip++)
     {
         t=new Object();
-        t.px=x;
-        t.py=y;
+        t.px=x+rand(-5,5);
+        t.py=y+rand(-5,5);
         t.dx=rand(-3,3);
         t.dy=rand(-3,3);
         t.color=color;
