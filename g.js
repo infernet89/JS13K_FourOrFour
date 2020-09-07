@@ -10,6 +10,9 @@ var canvasH;
 var ctx;
 var activeTask;
 var level;
+var particles=[];
+var gridOffsetX=100;
+var gridOffsetY=500;
 
 //mobile controls
 var mousex=-100;
@@ -22,12 +25,15 @@ ctx = canvas.getContext("2d");
 canvasW=canvas.width  = 1080;//window.innerWidth;
 canvasH=canvas.height = 1920;//window.innerHeight;
 var tileSize=100;
+var possibleValues=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+var possibleValues=["4","0"];
 var grid=[[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}]];
 for(var i=0;i<10;i++)
     for(var j=0;j<10;j++)
     {
+        grid[i][j].val=possibleValues[rand(0,possibleValues.length-1)];
         grid[i][j].animationX=0;
-        grid[i][j].animationY=0;
+        grid[i][j].animationY=-2000;
     }
 
 //controls
@@ -98,8 +104,6 @@ function run()
     else if(level==0)
     {
         var animatingObjects=0;
-        var gridOffsetX=100;
-        var gridOffsetY=500;
         var selectedList=[];
 
         ctx.fillStyle="#FFF";
@@ -147,12 +151,13 @@ function run()
         //sta cliccando, ed è in mezzo a 4 oggetti
         if(dragging && selectedList.length>=3)
         {
-            rotateTiles(selectedList);
             dragging=false;
+            rotateTiles(selectedList);
         }
         //le animazioni sono finite
         else if(animatingObjects==0)
             checkForFour();
+        drawParticles();
     }
 }
 function checkForFour()
@@ -170,15 +175,17 @@ function checkForFour()
                     grid[i+1][k].val=grid[i+1][k-2].val;
                     grid[i+1][k].animationY=-200;
                 }
-                //TODO fai apparire 4 blocchi sopra
-                grid[i][0].val="_";
+                //fai apparire 4 blocchi sopra
+                grid[i][0].val=possibleValues[rand(0,possibleValues.length-1)];
+                grid[i+1][0].val=possibleValues[rand(0,possibleValues.length-1)];
+                grid[i][1].val=possibleValues[rand(0,possibleValues.length-1)];
+                grid[i+1][1].val=possibleValues[rand(0,possibleValues.length-1)];
                 grid[i][0].animationY=-800;
-                grid[i+1][0].val="!";
                 grid[i+1][0].animationY=-800;
-                grid[i][1].val="?";
                 grid[i][1].animationY=-800;
-                grid[i+1][1].val="=";
                 grid[i+1][1].animationY=-800;
+                //effetto esplosione
+                explosionParticles(gridOffsetX+(i+0.5)*tileSize,gridOffsetY+(j+0.5)*tileSize,"#FFF");
             }
         }
 }
@@ -203,6 +210,38 @@ function rotateTiles(selectedList)
     grid[Or][Oc+1].animationX=100;
     grid[Or+1][Oc+1].animationY=-100;
     grid[Or+1][Oc].animationX=-100;
+}
+function explosionParticles(x,y,color)
+{
+    for(ip=0;ip<50;ip++)
+    {
+        t=new Object();
+        t.px=x;
+        t.py=y;
+        t.dx=rand(-3,3);
+        t.dy=rand(-3,3);
+        t.color=color;
+        t.ttl=rand(5,50);
+        particles.push(t);
+    }
+}
+function drawParticles()
+{
+    ctx.save();
+    for(ipd=0;ipd<particles.length;ipd++)
+    {
+        ctx.fillStyle=particles[ipd].color;
+        ctx.fillRect(particles[ipd].px,particles[ipd].py,3,3);
+        particles[ipd].px+=particles[ipd].dx;
+        particles[ipd].py+=particles[ipd].dy;
+        particles[ipd].ttl--;
+        if(particles[ipd].ttl<=0)
+        {
+            particles.splice(ipd,1);
+            ipd=ipd-1;
+        }
+    }
+    ctx.restore();
 }
 /*#############
     Funzioni Utili
