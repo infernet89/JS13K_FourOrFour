@@ -38,6 +38,10 @@ for(var i=0;i<10;i++)
         grid[i][j].animationY=-2000;
     }
 
+//pictures
+toilet4 = new Image();
+toilet4.src = "pic/toilet4.png";
+
 //controls
 canvas.addEventListener("mousemove",mossoMouse);
 canvas.addEventListener("mousedown",cliccatoMouse);
@@ -168,6 +172,14 @@ function run()
         ctx.lineWidth = "3";
         for(var i=0;i<possibleValues.length;i++)
         {
+            if(i==0)
+            {
+                ctx.save();
+                ctx.translate(50,1850-i*80);
+                ctx.drawImage(toilet4, 0, -toilet4.height/2);//-toilet4.width/2
+                ctx.restore();
+            }
+
             ctx.beginPath();
             ctx.rect(150,1850-i*80,800,20);
             ctx.stroke();
