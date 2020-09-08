@@ -25,9 +25,11 @@ ctx = canvas.getContext("2d");
 canvasW=canvas.width  = 1080;//window.innerWidth;
 canvasH=canvas.height = 1920;//window.innerHeight;
 var tileSize=100;
-var possibleValues=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
-var possibleValues=["4","0"];
-var grid=[[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}],[{val:"A"},{val:"E"},{val:"I"},{val:"O"},{val:"U"},{val:"Y"},{val:"f"},{val:"o"},{val:"u"},{val:"r"}]];
+var possibleValues=[0,1,2,3];
+var possibleColors=["#C00","#30C","#F60","#6C0","#CF0"];
+var progresses=[0,0,0,0];
+//var possibleValues=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+var grid=[[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}]];
 for(var i=0;i<10;i++)
     for(var j=0;j<10;j++)
     {
@@ -109,11 +111,12 @@ function run()
         ctx.fillStyle="#FFF";
         ctx.font = "80px Arial";
         ctx.textAlign = "center";
+        //griglia
         for(var i=0;i<10;i++)
             for(var j=0;j<10;j++)
             {
-                ctx.fillStyle="#FFF";
-                ctx.fillText(grid[i][j].val,gridOffsetX+i*tileSize+grid[i][j].animationX,gridOffsetY+j*tileSize+grid[i][j].animationY);
+                ctx.fillStyle=possibleColors[grid[i][j].val];
+                ctx.fillText(grid[i][j].val,gridOffsetX+i*tileSize+grid[i][j].animationX,gridOffsetY+j*tileSize+grid[i][j].animationY);//TODO icone
                 
                 //gestisci le animazioni
                 if(Math.abs(grid[i][j].animationX)>1)
@@ -158,6 +161,21 @@ function run()
         else if(animatingObjects==0)
             checkForFour();
         drawParticles();
+
+        //barre di scoreboard
+        ctx.strokeStyle="#FFF";
+        ctx.font = "30px Arial";
+        ctx.lineWidth = "3";
+        for(var i=0;i<possibleValues.length;i++)
+        {
+            ctx.beginPath();
+            ctx.rect(150,1850-i*80,800,20);
+            ctx.stroke();
+            ctx.fillStyle=possibleColors[i];
+            ctx.fillRect(150,1850-i*80,progresses[i]%800,20);
+            ctx.fillStyle="#FFF";
+            ctx.fillText("Lv. "+(Math.floor(progresses[i]/800)+1),1000,1870-i*80);
+        }
     }
 }
 function checkForFour()
@@ -167,6 +185,8 @@ function checkForFour()
         {
             if(grid[i][j].val==grid[i+1][j].val && grid[i][j].val==grid[i][j+1].val && grid[i][j].val==grid[i+1][j+1].val)
             {
+                //effetto esplosione
+                explosionParticles(gridOffsetX+(i+0.5)*tileSize,gridOffsetY+(j+0.5)*tileSize,possibleColors[grid[i][j].val],grid[i][j].val);
                 //sposta in giù di 2 (gravità)
                 for(var k=j+1;k>1;k--)
                 {
@@ -184,8 +204,6 @@ function checkForFour()
                 grid[i+1][0].animationY=-800;
                 grid[i][1].animationY=-800;
                 grid[i+1][1].animationY=-800;
-                //effetto esplosione
-                explosionParticles(gridOffsetX+(i+0.5)*tileSize,gridOffsetY+(j+0.5)*tileSize,"#FFF");
             }
         }
 }
@@ -211,17 +229,18 @@ function rotateTiles(selectedList)
     grid[Or+1][Oc+1].animationY=-100;
     grid[Or+1][Oc].animationX=-100;
 }
-function explosionParticles(x,y,color)
+function explosionParticles(x,y,color,value)
 {
     for(ip=0;ip<50;ip++)
     {
         t=new Object();
         t.px=x+rand(-5,5);
         t.py=y+rand(-5,5);
-        t.dx=rand(-3,3);
-        t.dy=rand(-3,3);
+        t.dx=rand(-6,6);
+        t.dy=rand(-9,6);
         t.color=color;
-        t.ttl=rand(5,50);
+        t.value=value;
+        t.ttl=rand(5,90);
         particles.push(t);
     }
 }
@@ -231,12 +250,14 @@ function drawParticles()
     for(ipd=0;ipd<particles.length;ipd++)
     {
         ctx.fillStyle=particles[ipd].color;
-        ctx.fillRect(particles[ipd].px,particles[ipd].py,3,3);
+        ctx.fillRect(particles[ipd].px,particles[ipd].py,5,5);
         particles[ipd].px+=particles[ipd].dx;
         particles[ipd].py+=particles[ipd].dy;
+        particles[ipd].dy+=0.8;//gravity
         particles[ipd].ttl--;
         if(particles[ipd].ttl<=0)
         {
+            progresses[particles[ipd].value]+=5;//dimensione della particle
             particles.splice(ipd,1);
             ipd=ipd-1;
         }
