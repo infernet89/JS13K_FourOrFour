@@ -26,7 +26,7 @@ canvasW=canvas.width  = 1080;//window.innerWidth;
 canvasH=canvas.height = 1920;//window.innerHeight;
 var tileSize=100;
 var possibleValues=[0,1,2,3];
-var possibleColors=["#C00","#30C","#F60","#6C0","#CF0"];
+var possibleColors=["#C00","#777","#F60","#6C0","#CF0"];
 var progresses=[0,0,0,0];
 //var possibleValues=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 var grid=[[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}]];
@@ -39,6 +39,15 @@ for(var i=0;i<10;i++)
     }
 
 //pictures
+covid = new Image();
+covid.src = "pic/covid.png";
+toilet = new Image();
+toilet.src = "pic/toilet.png";
+mask = new Image();
+mask.src = "pic/mask.png";
+sanitizer = new Image();
+sanitizer.src = "pic/sanitizer.png";
+
 toilet4 = new Image();
 toilet4.src = "pic/toilet4.png";
 
@@ -120,7 +129,26 @@ function run()
             for(var j=0;j<10;j++)
             {
                 ctx.fillStyle=possibleColors[grid[i][j].val];
-                ctx.fillText(grid[i][j].val,gridOffsetX+i*tileSize+grid[i][j].animationX,gridOffsetY+j*tileSize+grid[i][j].animationY);//TODO icone
+                //TODO refactor di queste righe per evitare ridondanza
+                if(grid[i][j].val==0)
+                {
+                     ctx.drawImage(covid, 0,0,tileSize,tileSize,gridOffsetX+i*tileSize+grid[i][j].animationX-tileSize/2,gridOffsetY+j*tileSize+grid[i][j].animationY-tileSize/2,tileSize,tileSize);
+                }
+                else if(grid[i][j].val==1)
+                {
+                    ctx.drawImage(toilet, 0,0,tileSize,tileSize,gridOffsetX+i*tileSize+grid[i][j].animationX-tileSize/2,gridOffsetY+j*tileSize+grid[i][j].animationY-tileSize/2,tileSize,tileSize);
+                }
+                else if(grid[i][j].val==2)
+                {
+                    ctx.drawImage(mask, 0,0,tileSize,tileSize,gridOffsetX+i*tileSize+grid[i][j].animationX-tileSize/2,gridOffsetY+j*tileSize+grid[i][j].animationY-tileSize/2,tileSize,tileSize);
+                }
+                else if(grid[i][j].val==3)
+                {
+                    ctx.drawImage(sanitizer, 0,0,tileSize,tileSize,gridOffsetX+i*tileSize+grid[i][j].animationX-tileSize/2,gridOffsetY+j*tileSize+grid[i][j].animationY-tileSize/2,tileSize,tileSize);
+                }
+                //TODO refactor di queste righe SOPRA per evitare ridondanza
+                else
+                    ctx.fillText(grid[i][j].val,gridOffsetX+i*tileSize+grid[i][j].animationX,gridOffsetY+j*tileSize+grid[i][j].animationY);//TODO icone
                 
                 //gestisci le animazioni
                 if(Math.abs(grid[i][j].animationX)>1)
@@ -172,7 +200,7 @@ function run()
         ctx.lineWidth = "3";
         for(var i=0;i<possibleValues.length;i++)
         {
-            if(i==0)
+            if(i==1)
             {
                 ctx.save();
                 ctx.translate(50,1850-i*80);
@@ -243,7 +271,8 @@ function rotateTiles(selectedList)
 }
 function explosionParticles(x,y,color,value)
 {
-    for(ip=0;ip<50;ip++)
+    var nOfParticles=rand(30,50);
+    for(ip=0;ip<nOfParticles;ip++)
     {
         t=new Object();
         t.px=x+rand(-5,5);
