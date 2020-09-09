@@ -372,28 +372,29 @@ function distanceFrom(ax,ay,bx,by)
     return Math.sqrt((ax-bx)*(ax-bx)+(ay-by)*(ay-by));
 }
 //controlli mobile
-function mossoTap(evt)
-{
-    evt.preventDefault();
-    dragging=true;
-    var rect = canvas.getBoundingClientRect();
-    mousex = evt.targetTouches[0].pageX,
-    mousey = evt.targetTouches[0].pageY;
-}
 function cliccatoTap(evt)
 {
     evt.preventDefault();
+    dragging=false;
     var rect = canvas.getBoundingClientRect();
-    mousex = evt.targetTouches[0].pageX,
-    mousey = evt.targetTouches[0].pageY;
+    mousex = (evt.targetTouches[0].pageX-rect.left)/(rect.right-rect.left)*canvasW;
+    mousey = (evt.targetTouches[0].pageY-rect.top)/(rect.bottom-rect.top)*canvasH;
+}
+function mossoTap(evt)
+{
+    evt.preventDefault();
+    dragging=false;
+    var rect = canvas.getBoundingClientRect();
+    mousex = (evt.targetTouches[0].pageX-rect.left)/(rect.right-rect.left)*canvasW;
+    mousey = (evt.targetTouches[0].pageY-rect.top)/(rect.bottom-rect.top)*canvasH;
 }
 function rilasciatoTap(evt)
 {
     evt.preventDefault();
-    dragging=false;
-    mousey=-100;
-    mousex=-100;
-}
+    dragging=true;
+    setTimeout(function(){ mousey=-100;  mousex=-100; }, 100);
+
+;}
 //uindows
 function cliccatoMouse(evt)
 {
