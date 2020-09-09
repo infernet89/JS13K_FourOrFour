@@ -49,8 +49,23 @@ sanitizer = new Image();
 sanitizer.src = "pic/sanitizer.png";
 var possiblePictures=[covid,toilet,mask,sanitizer];
 
+toilet1 = new Image();
+toilet1.src = "pic/toilet1.png";
+toilet2 = new Image();
+toilet2.src = "pic/toilet2.png";
+toilet3 = new Image();
+toilet3.src = "pic/toilet3.png";
 toilet4 = new Image();
 toilet4.src = "pic/toilet4.png";
+mask1 = new Image();
+mask1.src = "pic/mask1.png";
+mask2 = new Image();
+mask2.src = "pic/mask2.png";
+mask3 = new Image();
+mask3.src = "pic/mask3.png";
+mask4 = new Image();
+mask4.src = "pic/mask4.png";
+var barPictures=[[covid,covid,covid,covid],[toilet1,toilet2,toilet3,toilet4],[mask1,mask2,mask3,mask4],[covid,covid,covid,covid]];
 
 //controls
 canvas.addEventListener("mousemove",mossoMouse);
@@ -151,7 +166,6 @@ function run()
                 //disegna l'icona
                 ctx.fillStyle=possibleColors[grid[i][j].val];
                 ctx.drawImage(possiblePictures[grid[i][j].val], 0,0,tileSize,tileSize,gridOffsetX+i*tileSize+grid[i][j].animationX+selectedOffsetX-tileSize/2,gridOffsetY+j*tileSize+grid[i][j].animationY+selectedOffsetY-tileSize/2,tileSize,tileSize);
-                //ctx.fillText(grid[i][j].val,gridOffsetX+i*tileSize+grid[i][j].animationX,gridOffsetY+j*tileSize+grid[i][j].animationY);//TODO icone
                 
                 //gestisci le animazioni
                 if(Math.abs(grid[i][j].animationX)>1)
@@ -184,30 +198,72 @@ function run()
         else if(animatingObjects==0)
             checkForFour();
         drawParticles();
-
-        //barre di scoreboard
-        ctx.strokeStyle="#FFF";
-        ctx.font = "30px Arial";
-        ctx.lineWidth = "3";
-        for(var i=0;i<possibleValues.length;i++)
-        {
-            if(i==1)
-            {
-                ctx.save();
-                ctx.translate(50,1850-i*80);
-                ctx.drawImage(toilet4, 0, -toilet4.height/2);//-toilet4.width/2
-                ctx.restore();
-            }
-
-            ctx.beginPath();
-            ctx.rect(150,1850-i*80,800,20);
-            ctx.stroke();
-            ctx.fillStyle=possibleColors[i];
-            ctx.fillRect(150,1850-i*80,progresses[i]%800,20);
-            ctx.fillStyle="#FFF";
-            ctx.fillText("Lv. "+(Math.floor(progresses[i]/800)+1),1000,1870-i*80);
-        }
+        drawBars();
     }
+}
+function gameOver()
+{
+    for(var i=0;i<10;i++)
+        for(var j=0;j<10;j++)
+            grid[i][j].val=0;
+    possibleValues=[0];
+}
+function drawBars()
+{
+    if(possibleValues.length==1)
+    {
+        ctx.font = "120px Arial";
+        ctx.fillStyle=possibleColors[0];
+        ctx.fillText("YOU LOST.",500,1700);
+        return;
+    }
+    var lvl;
+    //barre di scoreboard
+    ctx.strokeStyle="#FFF";
+    ctx.font = "30px Arial";
+    ctx.lineWidth = "3";
+    for(var i=1;i<possibleValues.length;i++)
+    {
+        lvl=Math.floor(progresses[i]/800);
+        if(lvl>3)
+            lvl=3;
+        //icon
+        ctx.save();
+        ctx.translate(50,1880-i*90);
+        ctx.drawImage(barPictures[i][lvl], 0, -25);
+        ctx.restore();
+
+        ctx.beginPath();
+        ctx.rect(150,1870-i*90,800,20);
+        ctx.stroke();
+        ctx.fillStyle=possibleColors[i];
+        if(progresses[i]>800*4)
+        {
+            ctx.fillRect(150,1870-i*90,800,20);
+            ctx.fillStyle="#FFF";
+            ctx.fillText("Lv. ∞",1000,1890-i*90);
+        }
+        else
+        {
+            ctx.fillRect(150,1870-i*90,progresses[i]%800,20);
+            ctx.fillStyle="#FFF";
+            ctx.fillText("Lv. "+(lvl+1),1000,1890-i*90);
+        }
+        //le risorse si consumano overtime
+        if(progresses[i]>1) progresses[i]-=0.2;
+    }
+    //big Covid bar
+    ctx.beginPath();
+    ctx.rect(100,150,802,50);
+    ctx.stroke();
+    ctx.fillStyle=possibleColors[0];
+    ctx.fillRect(102,152,progresses[0]%800,46);
+    ctx.fillStyle="#FFF";
+    ctx.font = "45px Arial";
+    ctx.fillText("Lv. "+(Math.floor(progresses[0]/800)+1),1010,190);
+    progresses[0]+=0.2;
+    if(progresses[0]>800*4)
+        gameOver();
 }
 function checkForFour()
 {
@@ -285,7 +341,9 @@ function drawParticles()
         ctx.fillRect(particles[ipd].px,particles[ipd].py,5,5);
         particles[ipd].px+=particles[ipd].dx;
         particles[ipd].py+=particles[ipd].dy;
-        particles[ipd].dy+=0.8;//gravity
+        if(t.value==0)
+            particles[ipd].dy-=0.8;//gravity    
+        else particles[ipd].dy+=0.8;//gravity
         particles[ipd].ttl--;
         if(particles[ipd].ttl<=0)
         {
