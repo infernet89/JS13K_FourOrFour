@@ -47,6 +47,7 @@ mask = new Image();
 mask.src = "pic/mask.png";
 sanitizer = new Image();
 sanitizer.src = "pic/sanitizer.png";
+var possiblePictures=[covid,toilet,mask,sanitizer];
 
 toilet4 = new Image();
 toilet4.src = "pic/toilet4.png";
@@ -128,27 +129,29 @@ function run()
         for(var i=0;i<10;i++)
             for(var j=0;j<10;j++)
             {
-                ctx.fillStyle=possibleColors[grid[i][j].val];
-                //TODO refactor di queste righe per evitare ridondanza
-                if(grid[i][j].val==0)
+                 //controlla se il mouse l'ha selezionato
+                if(distanceFrom(mousex,mousey,i*tileSize+gridOffsetX,j*tileSize+gridOffsetY)<100)
                 {
-                     ctx.drawImage(covid, 0,0,tileSize,tileSize,gridOffsetX+i*tileSize+grid[i][j].animationX-tileSize/2,gridOffsetY+j*tileSize+grid[i][j].animationY-tileSize/2,tileSize,tileSize);
+                    var tmp=new Object();
+                    tmp.r=i;
+                    tmp.c=j;
+                    selectedList.push(tmp);
+                    //ctx.fillStyle="#F00";
+                    selectedOffsetX=rand(-1,1);
+                    selectedOffsetY=rand(-1,1);
                 }
-                else if(grid[i][j].val==1)
-                {
-                    ctx.drawImage(toilet, 0,0,tileSize,tileSize,gridOffsetX+i*tileSize+grid[i][j].animationX-tileSize/2,gridOffsetY+j*tileSize+grid[i][j].animationY-tileSize/2,tileSize,tileSize);
-                }
-                else if(grid[i][j].val==2)
-                {
-                    ctx.drawImage(mask, 0,0,tileSize,tileSize,gridOffsetX+i*tileSize+grid[i][j].animationX-tileSize/2,gridOffsetY+j*tileSize+grid[i][j].animationY-tileSize/2,tileSize,tileSize);
-                }
-                else if(grid[i][j].val==3)
-                {
-                    ctx.drawImage(sanitizer, 0,0,tileSize,tileSize,gridOffsetX+i*tileSize+grid[i][j].animationX-tileSize/2,gridOffsetY+j*tileSize+grid[i][j].animationY-tileSize/2,tileSize,tileSize);
-                }
-                //TODO refactor di queste righe SOPRA per evitare ridondanza
                 else
-                    ctx.fillText(grid[i][j].val,gridOffsetX+i*tileSize+grid[i][j].animationX,gridOffsetY+j*tileSize+grid[i][j].animationY);//TODO icone
+                {
+                    //ctx.fillStyle="#0F0";
+                    selectedOffsetX=0;
+                    selectedOffsetY=0;
+                }
+                //ctx.fillRect(i*tileSize+gridOffsetX,j*tileSize+gridOffsetY,10,10);
+
+                //disegna l'icona
+                ctx.fillStyle=possibleColors[grid[i][j].val];
+                ctx.drawImage(possiblePictures[grid[i][j].val], 0,0,tileSize,tileSize,gridOffsetX+i*tileSize+grid[i][j].animationX+selectedOffsetX-tileSize/2,gridOffsetY+j*tileSize+grid[i][j].animationY+selectedOffsetY-tileSize/2,tileSize,tileSize);
+                //ctx.fillText(grid[i][j].val,gridOffsetX+i*tileSize+grid[i][j].animationX,gridOffsetY+j*tileSize+grid[i][j].animationY);//TODO icone
                 
                 //gestisci le animazioni
                 if(Math.abs(grid[i][j].animationX)>1)
@@ -169,19 +172,7 @@ function run()
                 {
                     grid[i][j].animationY=0;
                 }                    
-
-                //controlla se il mouse l'ha selezionato
-                if(distanceFrom(mousex,mousey,i*tileSize+gridOffsetX,j*tileSize+gridOffsetY)<100)
-                {
-                    var tmp=new Object();
-                    tmp.r=i;
-                    tmp.c=j;
-                    selectedList.push(tmp);
-                    ctx.fillStyle="#F00";
-                }
-                else
-                    ctx.fillStyle="#0F0";
-                ctx.fillRect(i*tileSize+gridOffsetX,j*tileSize+gridOffsetY,10,10);
+                
             }
         //sta cliccando, ed è in mezzo a 4 oggetti
         if(dragging && selectedList.length>=3)
