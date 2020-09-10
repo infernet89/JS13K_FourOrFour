@@ -1,3 +1,7 @@
+/*
+scusa se stai leggendo questo codice.
+c'era il trasloco, a mia discolpa
+*/
 // < >
 var DEBUG=0;
 //costant
@@ -58,7 +62,11 @@ mask3 = new Image();
 mask3.src = "pic/mask3.png";
 mask4 = new Image();
 mask4.src = "pic/mask4.png";
-var barPictures=[[covid,covid,covid,covid],[toilet1,toilet2,toilet3,toilet4],[mask1,mask2,mask3,mask4],[covid,covid,covid,covid]];
+sanitizer4 = new Image();
+sanitizer4.src = "pic/sanitizer4.png";
+covid4 = new Image();
+covid4.src = "pic/covid4.png";
+var barPictures=[[covid4,covid4,covid4,covid4],[toilet1,toilet2,toilet3,toilet4],[mask1,mask2,mask3,mask4],[sanitizer4,sanitizer4,sanitizer4,sanitizer4]];
 
 //controls
 canvas.addEventListener("mousemove",mossoMouse);
@@ -140,7 +148,7 @@ function run()
     if(level==-1)
     {
         ctx.fillStyle="#EEE";
-        ctx.font = "120px Lucida Console";
+        ctx.font = "120px Monospace";
         four="";
         if(rand(0,3))
             four+="F";
@@ -159,7 +167,9 @@ function run()
         else
             four+="r";
         text="Four or "+four;
-        ctx.fillText(text,120,120);
+        ctx.textAlign = "center";
+        ctx.fillText(text,550,120);
+        ctx.textAlign = "left";
 
         //altra griglia?
         var animatingObjects=0;
@@ -245,7 +255,6 @@ function run()
 
         ctx.fillStyle="#FFF";
         ctx.font = "80px Arial";
-        ctx.textAlign = "center";
         //griglia
         for(var i=0;i<10;i++)
             for(var j=0;j<10;j++)
@@ -370,15 +379,16 @@ function drawBars()
     }
     else
     {
+        ctx.drawImage(covid4, 0,0,150,150,450,100,150,150);//TODO gestisci livelli multipli di coviddi
         //big Covid bar
         ctx.beginPath();
-        ctx.rect(100,150,802,50);
+        ctx.rect(100,250,802,50);
         ctx.stroke();
         ctx.fillStyle=possibleColors[0];
-        ctx.fillRect(102,152,progresses[0]%800,46);
+        ctx.fillRect(102,252,progresses[0]%800,46);
         ctx.fillStyle="#FFF";
         ctx.font = "45px Arial";
-        ctx.fillText("Lv. "+(Math.floor(progresses[0]/800)+1),1010,190);
+        ctx.fillText("Lv. "+(Math.floor(progresses[0]/800)+1),1010,290);
         progresses[0]+=0.2;
         if(progresses[0]>800*4)
             gameOver();
