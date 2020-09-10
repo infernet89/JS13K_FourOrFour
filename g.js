@@ -30,13 +30,6 @@ var possibleColors=["#C00","#777","#F60","#6C0","#CF0"];
 var progresses=[0,0,0,0];
 //var possibleValues=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 var grid=[[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}],[{},{},{},{},{},{},{},{},{},{}]];
-for(var i=0;i<10;i++)
-    for(var j=0;j<10;j++)
-    {
-        grid[i][j].val=possibleValues[rand(0,possibleValues.length-1)];
-        grid[i][j].animationX=0;
-        grid[i][j].animationY=-2000;
-    }
 
 //pictures
 covid = new Image();
@@ -75,13 +68,54 @@ canvas.addEventListener("touchstart", cliccatoTap);
 canvas.addEventListener("touchmove", mossoTap);
 canvas.addEventListener("touchend", rilasciatoTap);
 
-level=0;//TODO change level here (menu is -1)
+level=-1;//TODO change level here (menu is -1)
+var tutorial=" Tap on a group of 4to rotate. Form an  identical set of 4  to collect          Defeat the CoVid-19! ";
+/*
+"
+ Tap on a
+group of 4
+to rotate.
+ Form an
+identical
+ set of 4  
+to collect
+
+Defeat the
+CoVid-19!
+"
+*/
+
 generateLevel();
 activeTask=setInterval(run, 33);
 
 function generateLevel()
 {
-    //TODO here
+    if(level==-1)
+    {
+        tileSize=80;
+        gridOffsetX=150;
+        gridOffsetY=500;
+        for(var i=0;i<10;i++)
+            for(var j=0;j<10;j++)
+            {
+                grid[j][i].val=tutorial[i*10+j];
+                grid[j][i].animationX=rand(-4000,4000);
+                grid[j][i].animationY=rand(-4000,4000);
+            }
+    }
+    else if(level==0)
+    {
+        tileSize=100;
+        gridOffsetX=100;
+        gridOffsetY=500;
+        for(var i=0;i<10;i++)
+            for(var j=0;j<10;j++)
+            {
+                grid[i][j].val=possibleValues[rand(0,possibleValues.length-1)];
+                grid[i][j].animationX=0;
+                grid[i][j].animationY=-2000;
+            }
+    }
 }
 function run()
 {
@@ -126,6 +160,66 @@ function run()
             four+="r";
         text="Four or "+four;
         ctx.fillText(text,120,120);
+
+        //altra griglia?
+        var animatingObjects=0;
+        var selectedList=[];
+        for(var i=0;i<10;i++)
+            for(var j=0;j<10;j++)
+            {
+                 //controlla se il mouse l'ha selezionato
+                if(distanceFrom(mousex,mousey,i*tileSize+gridOffsetX,j*tileSize+gridOffsetY)<tileSize)
+                {
+                    var tmp=new Object();
+                    tmp.r=i;
+                    tmp.c=j;
+                    selectedList.push(tmp);
+                    selectedOffsetX=rand(-1,1);
+                    selectedOffsetY=rand(-1,1);
+                }
+                else
+                {
+                    selectedOffsetX=0;
+                    selectedOffsetY=0;
+                }
+
+                //disegna il testo
+                ctx.font = "80px Monospace";
+                ctx.fillStyle="#666";
+                ctx.fillText(grid[i][j].val,gridOffsetX+i*tileSize+grid[i][j].animationX+selectedOffsetX,gridOffsetY+j*tileSize+grid[i][j].animationY+selectedOffsetY);
+                ctx.strokeStyle="#FFF";
+                ctx.lineWidth = "1";
+                ctx.beginPath();
+                ctx.rect(gridOffsetX+i*tileSize+grid[i][j].animationX+selectedOffsetX,gridOffsetY+j*tileSize+grid[i][j].animationY+selectedOffsetY-tileSize+10,tileSize,tileSize);
+                ctx.stroke();
+                
+                //gestisci le animazioni
+                if(Math.abs(grid[i][j].animationX)>1)
+                {
+                    grid[i][j].animationX*=0.8
+                    animatingObjects++;
+                }                    
+                else
+                {
+                    grid[i][j].animationX=0;
+                }
+                if(Math.abs(grid[i][j].animationY)>1)
+                {
+                    grid[i][j].animationY*=0.8;
+                    animatingObjects++;
+                }
+                else
+                {
+                    grid[i][j].animationY=0;
+                }                    
+                
+            }
+        //sta cliccando, ed è in mezzo a 4 oggetti
+        if(dragging && selectedList.length>=3)
+        {
+            dragging=false;
+            rotateTiles(selectedList);
+        }
         
         ctx.fillStyle="#FFF";
         ctx.font = "12px Arial";
@@ -145,7 +239,7 @@ function run()
             for(var j=0;j<10;j++)
             {
                  //controlla se il mouse l'ha selezionato
-                if(distanceFrom(mousex,mousey,i*tileSize+gridOffsetX,j*tileSize+gridOffsetY)<100)
+                if(distanceFrom(mousex,mousey,i*tileSize+gridOffsetX,j*tileSize+gridOffsetY)<tileSize)
                 {
                     var tmp=new Object();
                     tmp.r=i;
@@ -218,6 +312,7 @@ function drawBars()
         return;
     }
     var lvl;
+    var maxedBars=0;
     //barre di scoreboard
     ctx.strokeStyle="#FFF";
     ctx.font = "30px Arial";
@@ -242,6 +337,7 @@ function drawBars()
             ctx.fillRect(150,1870-i*90,800,20);
             ctx.fillStyle="#FFF";
             ctx.fillText("Lv. ∞",1000,1890-i*90);
+            maxedBars++;
         }
         else
         {
@@ -250,20 +346,31 @@ function drawBars()
             ctx.fillText("Lv. "+(lvl+1),1000,1890-i*90);
         }
         //le risorse si consumano overtime
-        if(progresses[i]>1) progresses[i]-=0.2;
+        if(progresses[i]>1 && progresses[i]<=800*4) progresses[i]-=0.2;
     }
-    //big Covid bar
-    ctx.beginPath();
-    ctx.rect(100,150,802,50);
-    ctx.stroke();
-    ctx.fillStyle=possibleColors[0];
-    ctx.fillRect(102,152,progresses[0]%800,46);
-    ctx.fillStyle="#FFF";
-    ctx.font = "45px Arial";
-    ctx.fillText("Lv. "+(Math.floor(progresses[0]/800)+1),1010,190);
-    progresses[0]+=0.2;
-    if(progresses[0]>800*4)
-        gameOver();
+    //you won
+    if(maxedBars>=3)
+    {
+        possiblePictures[0]=sanitizer;
+        ctx.font = "120px Arial";
+        ctx.fillStyle=possibleColors[3];
+        ctx.fillText("YOU WON.",600,300);
+    }
+    else
+    {
+        //big Covid bar
+        ctx.beginPath();
+        ctx.rect(100,150,802,50);
+        ctx.stroke();
+        ctx.fillStyle=possibleColors[0];
+        ctx.fillRect(102,152,progresses[0]%800,46);
+        ctx.fillStyle="#FFF";
+        ctx.font = "45px Arial";
+        ctx.fillText("Lv. "+(Math.floor(progresses[0]/800)+1),1010,190);
+        progresses[0]+=0.2;
+        if(progresses[0]>800*4)
+            gameOver();
+    }
 }
 function checkForFour()
 {
@@ -311,10 +418,10 @@ function rotateTiles(selectedList)
     grid[Or+1][Oc+1]=grid[Or+1][Oc];
     grid[Or+1][Oc]=tmp;
 
-    grid[Or][Oc].animationY=100;
-    grid[Or][Oc+1].animationX=100;
-    grid[Or+1][Oc+1].animationY=-100;
-    grid[Or+1][Oc].animationX=-100;
+    grid[Or][Oc].animationY=tileSize;
+    grid[Or][Oc+1].animationX=tileSize;
+    grid[Or+1][Oc+1].animationY=-tileSize;
+    grid[Or+1][Oc].animationX=-tileSize;
 }
 function explosionParticles(x,y,color,value)
 {
