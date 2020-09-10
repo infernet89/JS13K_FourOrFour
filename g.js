@@ -69,7 +69,7 @@ canvas.addEventListener("touchmove", mossoTap);
 canvas.addEventListener("touchend", rilasciatoTap);
 
 level=-1;//TODO change level here (menu is -1)
-var tutorial=" Tap on a group of 4to rotate. Form an  identical set of 4  to collect          Defeat the CoVid-19! ";
+var tutorial=" Tap on a group of 4to rotate. Form an  identical  set of 4 to collect          Defeat the CoVid-19! ";
 /*
 "
  Tap on a
@@ -93,7 +93,7 @@ function generateLevel()
     if(level==-1)
     {
         tileSize=80;
-        gridOffsetX=150;
+        gridOffsetX=190;
         gridOffsetY=500;
         for(var i=0;i<10;i++)
             for(var j=0;j<10;j++)
@@ -186,11 +186,11 @@ function run()
                 //disegna il testo
                 ctx.font = "80px Monospace";
                 ctx.fillStyle="#666";
-                ctx.fillText(grid[i][j].val,gridOffsetX+i*tileSize+grid[i][j].animationX+selectedOffsetX,gridOffsetY+j*tileSize+grid[i][j].animationY+selectedOffsetY);
+                ctx.fillText(grid[i][j].val,gridOffsetX+i*tileSize+grid[i][j].animationX+selectedOffsetX-tileSize/2,gridOffsetY+j*tileSize+grid[i][j].animationY+selectedOffsetY);
                 ctx.strokeStyle="#FFF";
                 ctx.lineWidth = "1";
                 ctx.beginPath();
-                ctx.rect(gridOffsetX+i*tileSize+grid[i][j].animationX+selectedOffsetX,gridOffsetY+j*tileSize+grid[i][j].animationY+selectedOffsetY-tileSize+10,tileSize,tileSize);
+                ctx.rect(gridOffsetX+i*tileSize+grid[i][j].animationX+selectedOffsetX-tileSize/2,gridOffsetY+j*tileSize+grid[i][j].animationY+selectedOffsetY-tileSize+10,tileSize,tileSize);
                 ctx.stroke();
                 
                 //gestisci le animazioni
@@ -221,6 +221,18 @@ function run()
             rotateTiles(selectedList);
         }
         
+        //Play button
+        ctx.font = "180px Monospace";
+        ctx.fillStyle="#6C0";
+        ctx.fillText("PL",canvasW/2-100,canvasH-300);
+        ctx.fillText("AY",canvasW/2-100,canvasH-150);
+        if(dragging && distanceFrom(mousex,mousey,canvasW/2,canvasH-300)<150)
+        {
+            level=0;
+            generateLevel();
+        }
+
+
         ctx.fillStyle="#FFF";
         ctx.font = "12px Arial";
         ctx.fillText("By Infernet89",canvasW-75,canvasH-5);
