@@ -3,16 +3,12 @@ scusa se stai leggendo questo codice.
 c'era il trasloco, a mia discolpa
 */
 // < >
-var DEBUG=0;
-//costant
-var TO_RADIANS = Math.PI/180; 
 
 //global variables
 var canvas;
 var canvasW;
 var canvasH;
 var ctx;
-var activeTask;
 var level;
 var particles=[];
 var gridOffsetX=100;
@@ -46,27 +42,28 @@ sanitizer = new Image();
 sanitizer.src = "pic/sanitizer.png";
 var possiblePictures=[covid,toilet,mask,sanitizer];
 
-toilet1 = new Image();
+/*toilet1 = new Image();
 toilet1.src = "pic/toilet1.png";
 toilet2 = new Image();
 toilet2.src = "pic/toilet2.png";
 toilet3 = new Image();
-toilet3.src = "pic/toilet3.png";
+toilet3.src = "pic/toilet3.png";*/
 toilet4 = new Image();
 toilet4.src = "pic/toilet4.png";
-mask1 = new Image();
+/*mask1 = new Image();
 mask1.src = "pic/mask1.png";
 mask2 = new Image();
 mask2.src = "pic/mask2.png";
 mask3 = new Image();
-mask3.src = "pic/mask3.png";
+mask3.src = "pic/mask3.png";*/
 mask4 = new Image();
 mask4.src = "pic/mask4.png";
 sanitizer4 = new Image();
 sanitizer4.src = "pic/sanitizer4.png";
 covid4 = new Image();
 covid4.src = "pic/covid4.png";
-var barPictures=[[covid4,covid4,covid4,covid4],[toilet1,toilet2,toilet3,toilet4],[mask1,mask2,mask3,mask4],[sanitizer4,sanitizer4,sanitizer4,sanitizer4]];
+//var barPictures=[[covid4,covid4,covid4,covid4],[toilet1,toilet2,toilet3,toilet4],[mask1,mask2,mask3,mask4],[sanitizer4,sanitizer4,sanitizer4,sanitizer4]];
+var barPictures=[[covid4,covid4,covid4,covid4],[toilet4,toilet4,toilet4,toilet4],[mask4,mask4,mask4,mask4],[sanitizer4,sanitizer4,sanitizer4,sanitizer4]];
 
 //controls
 canvas.addEventListener("mousemove",mossoMouse);
@@ -94,7 +91,7 @@ CoVid-19!
 */
 
 generateLevel();
-activeTask=setInterval(run, 33);
+setInterval(run, 33);
 
 function generateLevel()
 {
@@ -329,7 +326,7 @@ function drawBars()
     {
         ctx.font = "120px Arial";
         ctx.fillStyle=possibleColors[0];
-        ctx.fillText("YOU LOST.",500,1700);
+        ctx.fillText("YOU LOST.",250,1700);
         return;
     }
     var lvl;
@@ -367,7 +364,7 @@ function drawBars()
             ctx.fillText("Lv. "+(lvl+1),1000,1890-i*90);
         }
         //le risorse si consumano overtime
-        if(progresses[i]>1 && progresses[i]<=800*4) progresses[i]-=0.2;
+        if(progresses[i]>1 && progresses[i]<=800*4) progresses[i]-=0.1;
     }
     //you won
     if(maxedBars>=3)
@@ -375,7 +372,7 @@ function drawBars()
         possiblePictures[0]=sanitizer;
         ctx.font = "120px Arial";
         ctx.fillStyle=possibleColors[3];
-        ctx.fillText("YOU WON.",600,300);
+        ctx.fillText("YOU WON.",250,300);
     }
     else
     {
@@ -388,7 +385,7 @@ function drawBars()
         ctx.fillRect(102,252,progresses[0]%800,46);
         ctx.fillStyle="#FFF";
         ctx.font = "45px Arial";
-        ctx.fillText("Lv. "+(Math.floor(progresses[0]/800)+1),1010,290);
+        ctx.fillText("Lv. "+(Math.floor(progresses[0]/800)+1),950,290);
         progresses[0]+=0.2;
         if(progresses[0]>800*4)
             gameOver();
@@ -491,10 +488,6 @@ function rand(da, a)
     if(da>a) return rand(a,da);
     a=a+1;
     return Math.floor(Math.random()*(a-da)+da);
-}
-function distanceFrom(a,b)
-{
-    return Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y));
 }
 function distanceFrom(ax,ay,bx,by)
 {
