@@ -42,28 +42,28 @@ sanitizer = new Image();
 sanitizer.src = "pic/sanitizer.png";
 var possiblePictures=[covid,toilet,mask,sanitizer];
 
-/*toilet1 = new Image();
+toilet1 = new Image();
 toilet1.src = "pic/toilet1.png";
 toilet2 = new Image();
 toilet2.src = "pic/toilet2.png";
 toilet3 = new Image();
-toilet3.src = "pic/toilet3.png";*/
+toilet3.src = "pic/toilet3.png";
 toilet4 = new Image();
 toilet4.src = "pic/toilet4.png";
-/*mask1 = new Image();
+mask1 = new Image();
 mask1.src = "pic/mask1.png";
 mask2 = new Image();
 mask2.src = "pic/mask2.png";
 mask3 = new Image();
-mask3.src = "pic/mask3.png";*/
+mask3.src = "pic/mask3.png";
 mask4 = new Image();
 mask4.src = "pic/mask4.png";
 sanitizer4 = new Image();
 sanitizer4.src = "pic/sanitizer4.png";
 covid4 = new Image();
 covid4.src = "pic/covid4.png";
-//var barPictures=[[covid4,covid4,covid4,covid4],[toilet1,toilet2,toilet3,toilet4],[mask1,mask2,mask3,mask4],[sanitizer4,sanitizer4,sanitizer4,sanitizer4]];
-var barPictures=[[covid4,covid4,covid4,covid4],[toilet4,toilet4,toilet4,toilet4],[mask4,mask4,mask4,mask4],[sanitizer4,sanitizer4,sanitizer4,sanitizer4]];
+var barPictures=[[covid4,covid4,covid4,covid4],[toilet1,toilet2,toilet3,toilet4],[mask1,mask2,mask3,mask4],[sanitizer4,sanitizer4,sanitizer4,sanitizer4]];
+//var barPictures=[[covid4,covid4,covid4,covid4],[toilet4,toilet4,toilet4,toilet4],[mask4,mask4,mask4,mask4],[sanitizer4,sanitizer4,sanitizer4,sanitizer4]];
 
 //controls
 canvas.addEventListener("mousemove",mossoMouse);
@@ -386,7 +386,7 @@ function drawBars()
         ctx.fillStyle="#FFF";
         ctx.font = "45px Arial";
         ctx.fillText("Lv. "+(Math.floor(progresses[0]/800)+1),950,290);
-        progresses[0]+=0.2;
+        progresses[0]+=0.1;
         if(progresses[0]>800*4)
             gameOver();
     }
